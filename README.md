@@ -149,14 +149,22 @@ y se eliminaron esos metadatos. No se modificaron los datos ni `app.py`.
 
 ## Preguntas
 
-**1. Contenido y perfil.** El contenido de los recursos está en `datos/recursos.csv`,
+### Pregunta 1 (2 pts)
+
+> ¿Qué información describe el contenido de los recursos y qué información constituye el perfil del usuario? Identifique ambas en los archivos del proyecto.
+
+**Respuesta:** El contenido de los recursos está en `datos/recursos.csv`,
 en la columna `etiquetas` (por ejemplo, "python web api"), que `construir_indice`
 convierte en la matriz TF-IDF. El perfil del usuario está en `datos/perfiles.json`,
 en el campo `intereses`, y se convierte en el vector inicial con `crear_perfil`.
 Durante la ejecución, el perfil es ese vector actual (`estado[usuario]`) más su
 historial de eventos (`historial[usuario]`) en `app.py`.
 
-**2. fit_transform y transform.** `fit_transform` aprende una sola vez, a partir del
+### Pregunta 2 (2 pts)
+
+> ¿Por qué se utiliza fit_transform sobre el catálogo y transform sobre los intereses del usuario? ¿Qué problema causaría ajustar un vectorizador diferente para cada perfil?
+
+**Respuesta:** `fit_transform` aprende una sola vez, a partir del
 catálogo, el vocabulario (17 términos) y los pesos IDF, y vectoriza los recursos.
 `transform` proyecta los intereses en ese mismo espacio, con las mismas columnas y
 los mismos IDF, lo que permite calcular el coseno. Si se ajustara un vectorizador
@@ -165,7 +173,11 @@ dimensión y otros IDF. Los vectores serían incompatibles con la matriz: la
 dimensión no coincidiría o la columna *i* significaría términos distintos, y las
 similitudes no tendrían sentido.
 
-**3. Recomendaciones distintas y 0,80.** La puntuación depende del vector del perfil.
+### Pregunta 3 (2 pts)
+
+> ¿Por qué el mismo catálogo puede producir recomendaciones distintas para u1 y u2? ¿Una similitud de 0,80 significa que existe un 80 % de probabilidad de que el recurso guste? Justifique.
+
+**Respuesta:** La puntuación depende del vector del perfil.
 u1 tiene peso en python, datos y pandas; u2 lo tiene en angular, componentes e
 interfaces. Por eso el coseno favorece recursos distintos: R02 para u1 y R07 para
 u2. Una similitud de 0,80 **no** significa una probabilidad del 80 % de que el
@@ -174,7 +186,11 @@ geométrica de solapamiento de etiquetas ponderadas. No está calibrada con dato
 de preferencias reales ni capta significado: sinónimos con palabras distintas
 dan 0.
 
-**4. Edición manual frente a adaptación.** Editar a mano `intereses` en el JSON
+### Pregunta 4 (2 pts)
+
+> ¿En qué se diferencia modificar manualmente los intereses iniciales de la adaptación implementada? Identifique el evento que provoca el cambio, el estado modificado y su efecto observable.
+
+**Respuesta:** Editar a mano `intereses` en el JSON
 cambia el punto de partida, exige reiniciar y no deja traza de por qué cambió.
 En la adaptación implementada, el **evento** es "Me interesa" sobre un recurso
 (R04). El **estado modificado** es solo el vector actual de ese usuario
@@ -183,7 +199,11 @@ y los demás usuarios no cambian. El **efecto observable** es el nuevo perfil
 (aparecen api y web) y las puntuaciones recalculadas en la misma ejecución
 (R05 pasa de 0 a 0.4378 y R04 llega al primer lugar).
 
-**5. MAPE-K.**
+### Pregunta 5 (2 pts)
+
+> Relacione su implementación con las etapas del ciclo MAPE-K estudiado en clase: Monitorizar, Analizar, Planificar, Ejecutar y Conocimiento. Indique una función, operación o dato de su programa para cada etapa.
+
+**Respuesta:**
 - *Monitorizar*: la opción `m` del modo interactivo o `registrar_interes` capturan
   el evento Me interesa y validan el ID con `obtener_indice`.
 - *Analizar*: `calcular_puntuaciones` mide la similitud (coseno) entre el perfil y
@@ -195,7 +215,11 @@ y los demás usuarios no cambian. El **efecto observable** es el nuevo perfil
 - *Conocimiento*: el vectorizador y la matriz TF-IDF del catálogo,
   `estado` (perfiles actuales) e `historial` (eventos por usuario).
 
-**6. Limitación y mejora.** Solo existe retroalimentación positiva, y con
+### Pregunta 6 (2 pts)
+
+> Indique una limitación del mecanismo implementado y proponga una mejora concreta. Explique qué dato adicional o qué cambio del algoritmo exigiría esa mejora.
+
+**Respuesta:** Solo existe retroalimentación positiva, y con
 alpha = 0.6 una sola valoración desplaza mucho el perfil y olvida rápido los
 intereses previos: pandas baja de 0.75 a 0.38 con un clic. Además, todo se pierde
 al reiniciar. Mejora propuesta: añadir la acción "No me interesa" con una regla
